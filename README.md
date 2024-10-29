@@ -42,7 +42,7 @@
 ## 程序特点
 * 支持多级树形目录
 * 支持相对路径
-* 设计图形化界面
+* 图形化界面
 
 ## 作者信息
   * 本项目由 [lzh](https://github.com/Lzh-12/JavaFX_Disk_System) 个人开发

@@ -17,9 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.example.disk.entity.FAT.initFAT;
 
-import static org.example.disk.controller.MainController.pathMap;
 import static org.example.disk.controller.MainController.currentNode;
-import static org.example.disk.controller.MainController.addNode;
 
 /**
  * 对文件分配表和目录登记表进行管理
@@ -27,9 +25,6 @@ import static org.example.disk.controller.MainController.addNode;
 public class FileManager {
     public static final Disk DISK = DiskManager.getDiskInstance(); // 目录登记表
     private final DirectoryItem root = new DirectoryItem("~", '8', 2, "root"); // 根目录
-    // 存放所有的路径信息
-    public static final List<PathItem> pathItems = new ArrayList<>();
-
     // 缓冲区
     private final char[] buffer1 = new char[DiskConstants.BUFFER_SIZE]; // 写缓冲区
     private final char[] buffer2 = new char[DiskConstants.BUFFER_SIZE]; // 读缓冲区
@@ -62,32 +57,8 @@ public class FileManager {
             System.out.println(Arrays.toString(DISK.bt[i]));
         }
 
-        // 字节为 8（00001000），表示该目录是一个目录的登记项
-        PathItem rootPath = new PathItem("~", null);
-        pathItems.add(rootPath);
-        root.setPath(rootPath);
-
         this.ofTle = new OfTle[OfTle.OPEN_FILE_TABLE_LENGTH];
     }
-
-
-    // 给定路径名找对象
-    public PathItem getPath(String path) {
-        for (PathItem path1 : pathItems) {
-            // 判断路径名是否相等
-            if (path1.getPathName().equals(path))
-                return path1;
-        }
-        return null;
-    }
-
-    // 返回全部路径
-    public List<PathItem> getPaths() {
-        return pathItems;
-    }
-
-    // 得到磁盘块
-
 
     // 对输入的文件名进行解析（~/f.txt  ~/test/f.txt ~/test/dir/t.txt）
     public String getCorrectFileName(String name) {
@@ -755,24 +726,8 @@ public class FileManager {
             FATUtil.addFATByte(freeBlock, (byte) -1);
 
             DirectoryItem newDirectoryItem = new DirectoryItem(name, '8', freeBlock, path);
-            // 创建路径对象
-            PathItem parentPath = getPath(path); // '/'
-            // 测试
-            PathItem pathItem = new PathItem(path + '/' + name, parentPath); // md ~/test
-            parentPath.addChildren(pathItem); // 添加到子目录路径中
-            currentNode = pathMap.get(parentPath);
-            addNode(currentNode, pathItem); // 目录树添加节点
 
-//            System.out.println("打印子目录" + " " + pathItem); // ~/test
 //            System.out.println("建立目录：" + path + '/' + name);
-            // 打印父目录下的路径
-//            System.out.println("父目录下的全部路径" + parentPath.getChildren() + "个数" + parentPath.getChildren().size());
-
-            pathItems.add(pathItem); // 添加到路径数组中
-            // 打印全部路径的数组
-//            System.out.println("路径数组下的全部路径数组" + " " + pathItems);
-
-            newDirectoryItem.setPath(pathItem); // 设置路径对象 '/test'  路径对象包括当前创建的目录名  路径location不包括
 //            System.out.println("建立目录的目录名" + name); // tmp
 
             // 填写目录登记表
@@ -848,30 +803,6 @@ public class FileManager {
                 int index = DirectoryUtil.findParentDisk(path);
 
                 System.out.println("父目录的磁盘号" + index); // 2
-
-                PathItem parentPath = null;
-                for (PathItem pathItem : pathItems) {
-                    if (pathItem.getPathName().equals(path + '/' + name)) {
-                        parentPath = pathItem;
-                    }
-                }
-
-                PathItem childPath = null;
-                for (PathItem pathItem : pathItems) {
-                    if (pathItem.getPathName().equals(path + '/' + name)) {
-                        childPath = pathItem;
-                    }
-                }
-                // 找到当前节点
-                try {
-                    currentNode = pathMap(parentPath);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-
-                // 在目录树中删除节点（父节点，路径对象）
-                MainController.removeNode(currentNode, childPath);
-
                 System.out.println("index" + index); // 2
 
                 // 在目录所在的父目录的目录登记项中删除该目录登记项（对于目录文件类型没有用到）
@@ -880,9 +811,6 @@ public class FileManager {
                  FATUtil.deleteFATByte(i);
                 // 清空文件目录项的内容（文件所在的目录登记项）
                 DirectoryUtil.deleteDirByte(i);
-                // 在路径数组中删除路径
-                pathItems.remove(getPath(path + '/' + name));
-                System.out.println("路径数组的大小" + pathItems.size());
 
                 for(int j = 0; j < 8; j++)
                     System.out.println(Arrays.toString(DISK.bt[j]));
@@ -908,19 +836,9 @@ public class FileManager {
                 return 1;
 
             // 查看路径是否存在
-            for (PathItem pathItem : pathItems) {
-                if (Objects.equals(pathItem.getPathName(), path + '/' + name))
-                    return 1;
-            }
-            return -1;
+            return DirectoryUtil.findDirDisk(path, name);
         } finally {
             readWriteLock.readLock().unlock();
         }
     }
-
-    // 得到目录树的节点
-    private TreeItem<String> pathMap(PathItem path) {
-        return pathMap.get(path);
-    }
-
 }

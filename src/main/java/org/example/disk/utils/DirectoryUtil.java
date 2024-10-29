@@ -105,7 +105,7 @@ public class DirectoryUtil {
         for(int i = 0; i < 8; i++){
             // 目录名和文件名三个字节
             StringBuilder stringBuilder = new StringBuilder();
-            // 得到文件名
+            // 空目录项
             if(DISK.bt[number][i * 8] == 0)
                 break;
 
@@ -116,11 +116,11 @@ public class DirectoryUtil {
             }
 
             // 不为空格表示文件要加上文件类型
-            if((char) DISK.bt[number][i * 8 + 3] != ' '){
+            if((int) DISK.bt[number][i * 8 + 5] == 3 || (int) DISK.bt[number][i * 8 + 5] == 4){
                 stringBuilder.append(".");
-                stringBuilder.append((char) DISK.bt[number][i * 8 + 3]);
-                stringBuilder.append((char) DISK.bt[number][i * 8 + 4]);
             }
+            stringBuilder.append((char) DISK.bt[number][i * 8 + 3]);
+            stringBuilder.append((char) DISK.bt[number][i * 8 + 4]);
             // 换行输出
             result.append(stringBuilder).append("\n");
         }

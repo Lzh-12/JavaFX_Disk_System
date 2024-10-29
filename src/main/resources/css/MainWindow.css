@@ -1,5 +1,4 @@
-/* 目录树 */
-.tree-view {
-    -fx-pref-width: 200px;
-    -fx-pref-height: 420px;
+.flow-pane {
+    -fx-hgap: 5px; /* 水平间距 */
+    -fx-vgap: 20px; /* 垂直间距 */
 }

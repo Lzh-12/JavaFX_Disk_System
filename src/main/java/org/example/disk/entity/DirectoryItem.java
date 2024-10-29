@@ -14,7 +14,6 @@ public class DirectoryItem{
     private int number; // 起始磁盘块
 
     private String location; // 目录的位置
-    private PathItem path; // 路径
 
     public DirectoryItem(String directoryName, char attribute, int number, String location) {
         this.directoryName = directoryName;
@@ -47,14 +46,6 @@ public class DirectoryItem{
         this.number = number;
     }
 
-
-    public PathItem getPath() {
-        return path;
-    }
-
-    public void setPath(PathItem path) {
-        this.path = path;
-    }
 
     public String getLocation() {
         return location;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- 文件系统主页面 -->
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.disk.controller.MainController"
+            prefHeight="420.0" prefWidth="650.0"
+            stylesheets="@../css/MainWindow.css">
+    <HBox AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0"
+          AnchorPane.topAnchor="0.0">
+        <SplitPane fx:id="splitPane" dividerPositions="0.23">
+            <ScrollPane >
+                <TreeView fx:id="treeView" styleClass="tree-view"/>
+            </ScrollPane>
+            <SplitPane orientation="VERTICAL" dividerPositions="0.25, 0.75" prefWidth="540">
+                    <FlowPane fx:id="flowPane"/>
+                <!-- 添加命令输入区域 -->
+                <TextArea fx:id="commandOutput" editable="false" promptText="命令输出..." prefHeight="100.0"/>
+                <TextField fx:id="commandInput" promptText="输入命令..."/>
+            </SplitPane>
+        </SplitPane>
+    </HBox>
+</AnchorPane>

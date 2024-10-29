@@ -1,0 +1,5 @@
+/* 目录树 */
+.tree-view {
+    -fx-pref-width: 200px;
+    -fx-pref-height: 420px;
+}

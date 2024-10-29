@@ -12,7 +12,7 @@ public class FileUtil {
     // 检查文件名是否重复（文件路径 文件名 文件类型）
     public static int findFileName(String path, String name, String fileType) {
         // 计算多少层目录
-        String[] paths = path.split("/"); // ~/tmp/var   3
+        String[] paths = path.split("/"); // ~/tmp   3
         // 根目录
         if(paths.length == 1){
             for(int j = 0; j < 8; j++){
@@ -54,7 +54,7 @@ public class FileUtil {
                     }
                 } else {
                     // 目录名相同
-                    if((char) DISK.bt[index][j * 8 + 3] != ' ' && stringBuilder.toString().equals(paths[i+1])) {
+                    if((int) DISK.bt[index][j * 8 + 5] == 8 && stringBuilder.toString().equals(paths[i+1])) {
                         index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
                         flag = true;
                     }
@@ -72,7 +72,7 @@ public class FileUtil {
     // 找到文件的父目录的磁盘号
     public static int findParentDisk(String path){
         // 计算多少层目录
-        String[] paths = path.split("/"); // ~/tmp/var   3
+        String[] paths = path.split("/"); // ~/tmp   2
         if(paths.length == 1)
             return 2;
 
@@ -81,18 +81,20 @@ public class FileUtil {
         for(int i = 0; i < paths.length - 1; i++){
             for(int j = 0; j < 8; j++){
                 StringBuilder stringBuilder = new StringBuilder();
-                for(int k = 0; k < 3; k++){
-                    // 下一级目录
-                    if((char) DISK.bt[index][j * 8 + k] != ' ')
-                        stringBuilder.append((char) DISK.bt[index][j * 8 + k]);
-                }
-
-                // 目录名相同
-                if((char) DISK.bt[index][j * 8 + 3] != ' ' && stringBuilder.toString().equals(paths[i+1])) {
-                    index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
-                    // 最下级的目录
-                    if(i == paths.length - 2){
-                        return index; // 返回var的磁盘号
+                // 目录的登记项
+                if((int) DISK.bt[index][j * 8 + 5] == 8){
+                    for(int k = 0; k < 3; k++){
+                        // 下一级目录
+                        if((char) DISK.bt[index][j * 8 + k] != ' ')
+                            stringBuilder.append((char) DISK.bt[index][j * 8 + k]);
+                    }
+                    // 目录名相同
+                    if(stringBuilder.toString().equals(paths[i+1])) {
+                        index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
+                        // 最下级的目录
+                        if(i == paths.length - 2){
+                            return index; // 返回var的磁盘号
+                        }
                     }
                 }
             }

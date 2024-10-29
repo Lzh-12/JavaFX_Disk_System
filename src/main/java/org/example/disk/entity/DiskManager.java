@@ -1,8 +1,10 @@
 package org.example.disk.entity;
 
-
 import java.io.*;
 
+/**
+ * 磁盘管理器
+ */
 public class DiskManager {
     public static Disk diskInstance;
 
@@ -29,7 +31,6 @@ public class DiskManager {
         return diskInstance;
     }
 
-
     public static void saveDiskInstance(){
         try (FileOutputStream fileOutputStream = new FileOutputStream(path);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
@@ -38,6 +39,4 @@ public class DiskManager {
             throw new RuntimeException(e);
         }
     }
-
-
 }

@@ -13,6 +13,8 @@ public class CmdConstants {
     public static final String QUIT = "quit";
     /* 显示文件系统的磁盘空间使用情况 */
     public static final String DF = "df";
+    /* 格式化 磁盘 */
+    public static final String MKFS = "mkfs";
 
 
     /**

@@ -59,8 +59,8 @@ public class MainController implements Initializable {
         // 命令行
         initCommandLine();
         this.stage = stage;
+        // 创建图标
         addIcon("~");
-
         // 设置窗口关闭事件处理器
         stage.setOnCloseRequest(event -> DiskManager.saveDiskInstance());
     }
@@ -294,8 +294,7 @@ public class MainController implements Initializable {
                                     } else {
                                         commandOutput.appendText("目录建立成功\n");
                                         flowPane.getChildren().clear();
-                                        // ~/tmp  path就是~
-                                        addIcon(path);
+                                        addIcon(path);// ~/tmp  path就是~
                                     }
                                 });
                             }
@@ -370,7 +369,12 @@ public class MainController implements Initializable {
                                     if(is_cd == -1){
                                         commandOutput.appendText(CmdConstants.DIRECTORY_IS_NOT_EXIT + "切换目录失败\n");
                                     } else {
-                                        commandPath = path + '/' + name;
+                                        if(name.equals("~"))
+                                            commandPath = path;
+                                        else
+                                            commandPath = path + '/' + name;
+                                        flowPane.getChildren().clear();
+                                        addIcon(commandPath);
                                     }
                                 });
                             }
@@ -381,6 +385,11 @@ public class MainController implements Initializable {
                     // 查看磁盘剩余空间
                     case CmdConstants.DF:
                         Platform.runLater(() -> commandOutput.appendText("磁盘剩余空间：" + DiskUtil.freeSpace() + "bytes\n"));
+                        break;
+                    case CmdConstants.MKFS:
+                        FileManager.formatDisk();
+                        flowPane.getChildren().clear();
+                        Platform.runLater(() -> commandOutput.appendText("磁盘格式化成功\n"));
                         break;
                     // 查看命令
                     case CmdConstants.HELP:
@@ -403,6 +412,7 @@ public class MainController implements Initializable {
                                 其他操作命令：
                                 help   查看所有命令
                                 df     查看磁盘状态
+                                mkfs   格式化磁盘
                                 clear  清屏
                                 quit   退出程序
                                 """
@@ -463,9 +473,9 @@ public class MainController implements Initializable {
         return Objects.equals(path, "r") || Objects.equals(path, "rw") || Objects.equals(path, "wr");
     }
 
-    /*
-        处理绝对路径和相对路径
-        对文件名进行解析获取父目录（~/a.txt  ~/test/a.txt）  得到（~     ~/test）
+    /**
+     * 处理绝对路径和相对路径
+     * 对文件名进行解析获取父目录（~/a.txt  ~/test/a.txt）  得到（~     ~/test）
      */
     private String getRealDirPath(String path) {
         // 绝对路径
@@ -509,7 +519,12 @@ public class MainController implements Initializable {
     // 添加图标到窗口
     public void addIcon(String path) {
         // 找到父目录的磁盘号
-        int index = DirectoryUtil.findParentDisk(path);
+        int index = 2; // 根目录
+        if(!Objects.equals(path, "~")){
+            String name = path.substring(path.lastIndexOf('/') + 1);
+            path = path.substring(0, path.lastIndexOf('/'));
+            index = DirectoryUtil.findDirDisk(path, name);
+        }
 
         // 图标数组
         Label[] labels = new Label[8];

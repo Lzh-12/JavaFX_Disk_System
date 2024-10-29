@@ -1,9 +1,7 @@
 package org.example.disk.service;
 
-import javafx.scene.control.TreeItem;
 import org.example.disk.constants.CmdConstants;
 import org.example.disk.constants.DiskConstants;
-import org.example.disk.controller.MainController;
 import org.example.disk.entity.*;
 import org.example.disk.constants.FileConstants;
 import org.example.disk.utils.DirectoryUtil;
@@ -17,14 +15,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.example.disk.entity.FAT.initFAT;
 
-import static org.example.disk.controller.MainController.currentNode;
-
 /**
  * 对文件分配表和目录登记表进行管理
  */
 public class FileManager {
     public static final Disk DISK = DiskManager.getDiskInstance(); // 目录登记表
-    private final DirectoryItem root = new DirectoryItem("~", '8', 2, "root"); // 根目录
     // 缓冲区
     private final char[] buffer1 = new char[DiskConstants.BUFFER_SIZE]; // 写缓冲区
     private final char[] buffer2 = new char[DiskConstants.BUFFER_SIZE]; // 读缓冲区
@@ -59,6 +54,7 @@ public class FileManager {
 
         this.ofTle = new OfTle[OfTle.OPEN_FILE_TABLE_LENGTH];
     }
+
 
     // 对输入的文件名进行解析（~/f.txt  ~/test/f.txt ~/test/dir/t.txt）
     public String getCorrectFileName(String name) {
@@ -840,5 +836,22 @@ public class FileManager {
         } finally {
             readWriteLock.readLock().unlock();
         }
+    }
+
+    /**
+     * 格式化磁盘
+     */
+    public static void formatDisk(){
+        for(int i = 0; i < DiskConstants.DISK_SIZE; i++){
+            Arrays.fill(DISK.bt[i], (byte) 0);
+        }
+
+        // 文件分配表和根目录
+        for(int i = 0; i < 3; i++)
+            DISK.bt[0][i] = -1;
+
+        // 已损坏磁盘
+        DISK.bt[0][23] = -2;
+        DISK.bt[0][49] = -2;
     }
 }

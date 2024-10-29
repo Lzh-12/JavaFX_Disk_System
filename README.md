@@ -43,4 +43,4 @@
 * 支持相对路径
 
 ## 作者信息
-  * 本项目由 [lzh](https://github.com/Lzh-12) 个人开发
+  * 本项目由 [lzh](https://github.com/Lzh-12/JavaFX_Disk_System) 个人开发

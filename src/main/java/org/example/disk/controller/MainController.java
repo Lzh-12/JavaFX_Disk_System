@@ -30,11 +30,8 @@ public class MainController implements Initializable {
     @FXML
     public SplitPane splitPane;
     @FXML
-    public TreeView<String> treeView; // 多级目录树
-    @FXML
     public FlowPane flowPane; // 文件列表
 
-    public static TreeItem<String> currentNode; // 当前节点
     private String currentPath; // 当前路径
 
     private FileManager fileManager;

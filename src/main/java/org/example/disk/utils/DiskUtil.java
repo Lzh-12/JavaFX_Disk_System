@@ -1,6 +1,9 @@
 package org.example.disk.utils;
 
 import org.example.disk.constants.DiskConstants;
+
+import java.util.Arrays;
+
 import static org.example.disk.service.FileManager.DISK;
 
 
@@ -39,5 +42,22 @@ public class DiskUtil {
                 freeSpace += 1;
         }
         return freeSpace;
+    }
+
+    /**
+     * 格式化磁盘
+     */
+    public static void formatDisk(){
+        for(int i = 0; i < DiskConstants.DISK_SIZE; i++){
+            Arrays.fill(DISK.bt[i], (byte) 0);
+        }
+
+        // 文件分配表和根目录
+        for(int i = 0; i < 3; i++)
+            DISK.bt[0][i] = -1;
+
+        // 已损坏磁盘
+        DISK.bt[0][23] = -2;
+        DISK.bt[0][49] = -2;
     }
 }

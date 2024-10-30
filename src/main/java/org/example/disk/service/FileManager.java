@@ -55,24 +55,6 @@ public class FileManager {
         this.ofTle = new OfTle[OfTle.OPEN_FILE_TABLE_LENGTH];
     }
 
-
-    // 对输入的文件名进行解析（~/f.txt  ~/test/f.txt ~/test/dir/t.txt）
-    public String getCorrectFileName(String name) {
-        // 记录反斜杠最后出现的位置
-        int split = name.lastIndexOf('/');
-        if (split == -1)
-            return "~";
-
-        return name.substring(split+1); // 文件名
-    }
-
-    // 对文件名进行解析获取父目录（~/a.txt  ~/test/a.txt）
-    public String getCorrectDirName(String name) {
-        // 记录反斜杠最后出现的位置
-        int split = name.lastIndexOf('/');
-        return name.substring(0, split); // 目录名
-    }
-
     // 得到文件类型（~/file.txt） 得到（txt）
     private String getFileType(String name){
         return name.substring(name.lastIndexOf(".") + 1);

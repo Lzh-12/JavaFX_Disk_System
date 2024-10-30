@@ -19,12 +19,10 @@ public class DirectoryManager {
      * 1、建立目录（md）
      */
     public int createDirectory(String path, String name){
-        // 建立目录首先要找到建立目录的位置（父目录），然后查找该目录是否存在
-        System.out.println("建立目录：" + path + " " + name); // ~    test      ~/tmp  test
         // 获取写锁
         readWriteLock.writeLock().lock();
-
         try {
+            // 建立目录首先要找到建立目录的位置（父目录），然后查找该目录是否存在
             int index = DirectoryUtil.findParentDisk(path); // 父目录的磁盘号
             if(index == -1)
                 return -1; // 父目录不存在
@@ -37,14 +35,9 @@ public class DirectoryManager {
 
             // 存在，则查找一个空目录项，为该目录申请一个盘块，并填写目录内容
             int freeBlock = FATUtil.findFreeBlock();
-            System.out.println("空闲磁盘号" + freeBlock); // 3
-
             // 修改文件分配表
             FATUtil.addFATByte(freeBlock, (byte) -1);
             DirectoryItem newDirectoryItem = new DirectoryItem(name, '8', freeBlock, path);
-
-//            System.out.println("建立目录：" + path + '/' + name);
-//            System.out.println("建立目录的目录名" + name); // tmp
 
             // 填写目录登记表
             byte[] bt = new byte[8];
@@ -105,22 +98,15 @@ public class DirectoryManager {
             if((path.equals("~") && name.equals("~")))
                 return 0;
 
-            System.out.println("删除空目录" + path + ' ' + name); // ~   test
-
             // 删除空目录首先要找到该目录，如果目录不存在，指令执行失败
             int i = DirectoryUtil.findDirDisk(path, name); // 目录的磁盘号
             if(i == -1)
                 return -1;
 
-            System.out.println("目录的磁盘号" + i); // 3
             // 如果存在，判断是否为空目录，为空则删除，否则显示不能删除
             if(DISK.bt[i][0] == (byte) 0){
                 // 父目录所在磁盘号（index），子目录磁盘号（i）
                 int index = DirectoryUtil.findParentDisk(path);
-
-                System.out.println("父目录的磁盘号" + index); // 2
-                System.out.println("index" + index); // 2
-
                 // 在目录所在的父目录的目录登记项中删除该目录登记项（对于目录文件类型没有用到）
                 DirectoryUtil.deleteByte(name, "8", index);
                 // 在目录登记表中的文件分配表中删除（磁盘号， 字节数组）

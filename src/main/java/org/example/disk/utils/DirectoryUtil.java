@@ -145,15 +145,15 @@ public class DirectoryUtil {
                     }
 
                     // 上一级目录只有根目录或者到了最后一级目录
-                    if(i == paths.length - 1 || paths.length == 1){
+                    if(i == paths.length - 1){
                         if(stringBuilder.toString().equals(name)) {
                             return DISK.bt[index][j * 8 + 6]; // 返回起始磁盘号
                         }
+                    } else {
+                        // 目录名相同
+                        if(stringBuilder.toString().equals(paths[i+1]))
+                            index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
                     }
-
-                    // 目录名相同
-                    if(stringBuilder.toString().equals(paths[i+1]))
-                        index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
                 }
             }
         }

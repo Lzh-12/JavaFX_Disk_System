@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.example.disk.entity.*;
+import org.example.disk.service.DirectoryManager;
 import org.example.disk.service.FileManager;
 import org.example.disk.constants.CmdConstants;
 import org.example.disk.constants.DirConstants;
@@ -26,7 +27,6 @@ import static org.example.disk.service.FileManager.DISK;
 
 
 public class MainController implements Initializable {
-    private static final String DISK_PATH = "Disk";
     @FXML
     public SplitPane splitPane;
     @FXML
@@ -35,6 +35,7 @@ public class MainController implements Initializable {
     private String currentPath; // 当前路径
 
     private FileManager fileManager;
+    private DirectoryManager directoryManager;
 
 
     @FXML
@@ -51,6 +52,8 @@ public class MainController implements Initializable {
     public void init(Stage stage) {
         // 文件管理器
         fileManager = new FileManager();
+        // 目录管理器
+        directoryManager = new DirectoryManager();
         // 根目录
         this.currentPath = "~";
         // 命令行
@@ -282,7 +285,7 @@ public class MainController implements Initializable {
                             if(isLegalDirName(name)){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.DIRECTORY_NAME_ERROR + "\n"));
                             } else {
-                                int is_md = fileManager.createDirectory(path, name);
+                                int is_md = directoryManager.createDirectory(path, name);
                                 Platform.runLater(() -> {
                                     if(is_md == -1){
                                         commandOutput.appendText("父目录不存在，不能建立\n");
@@ -307,7 +310,7 @@ public class MainController implements Initializable {
                             if(isLegalDirName(name)){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.DIRECTORY_NAME_ERROR + "\n"));
                             } else {
-                                String is_dir = fileManager.showDirectory(path, name);
+                                String is_dir = directoryManager.showDirectory(path, name);
                                 Platform.runLater(() -> commandOutput.appendText(is_dir + "\n"));
                             }
                         } else if(args.length == 1){
@@ -315,9 +318,9 @@ public class MainController implements Initializable {
                             // 根目录
                             Platform.runLater(() -> {
                                 if(split == -1)
-                                    commandOutput.appendText(fileManager.showDirectory(commandPath, commandPath) + "\n");
+                                    commandOutput.appendText(directoryManager.showDirectory(commandPath, commandPath) + "\n");
                                 else {
-                                    String is_dir = fileManager.showDirectory(commandPath.substring(0, split), commandPath.substring(split+1));
+                                    String is_dir = directoryManager.showDirectory(commandPath.substring(0, split), commandPath.substring(split+1));
                                     commandOutput.appendText(is_dir + "\n");
                                 }
                             });
@@ -334,7 +337,7 @@ public class MainController implements Initializable {
                             if(isLegalDirName(name)){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.DIRECTORY_NAME_ERROR + "\n"));
                             } else {
-                                int is_rd = fileManager.deleteDirectory(path, name);
+                                int is_rd = directoryManager.deleteDirectory(path, name);
                                 Platform.runLater(() -> {
                                     if(is_rd == -1){
                                         commandOutput.appendText(CmdConstants.DIRECTORY_IS_NOT_EXIT + "删除失败\n");
@@ -361,7 +364,7 @@ public class MainController implements Initializable {
                             if(isLegalDirName(name)){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.DIRECTORY_NAME_ERROR + "\n"));
                             } else {
-                                int is_cd = fileManager.changeDirectory(path, name);
+                                int is_cd = directoryManager.changeDirectory(path, name);
                                 Platform.runLater(() -> {
                                     if(is_cd == -1){
                                         commandOutput.appendText(CmdConstants.DIRECTORY_IS_NOT_EXIT + "切换目录失败\n");

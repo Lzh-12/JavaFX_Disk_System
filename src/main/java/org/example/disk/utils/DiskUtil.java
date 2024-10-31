@@ -9,7 +9,7 @@ import static org.example.disk.service.FileManager.DISK;
 
 public class DiskUtil {
     public static void addByte(int index, byte[] newData){
-        if(index < 0 || index > 127)
+        if(index < 0 || index > DiskConstants.DISK_SIZE-1)
             throw new IllegalArgumentException("index out of range");
 
         if(newData.length > 64|| DISK.bt[index].length > 64)
@@ -24,9 +24,6 @@ public class DiskUtil {
 
         if(currentLength + newData.length > 64)
             throw new IllegalArgumentException("data size too long");
-
-        System.out.println("currentLength " +  currentLength); // 0
-        System.out.println("newData " + newData.length);
 
         // 添加新数据
         for (int i = 0; i < newData.length; i++) {

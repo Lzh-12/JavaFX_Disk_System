@@ -116,7 +116,7 @@ public class MainController implements Initializable {
                         if(args.length == 3){
                             String path = getRealDirPath(args[1]); // 父目录
                             String name = getRealFilePath(args[1]); // 文件名
-                            if(isLegalFileName(name) && isLegalAttribute(args[2])){
+                            if(isLegalFileName(name) || isLegalAttribute(args[2])){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.FILE_NAME_ERROR + "\n"));
                             } else {
                                 int is_create = fileManager.createFile(path, name, args[2]);
@@ -259,10 +259,10 @@ public class MainController implements Initializable {
                         if (args.length == 3) {
                             String path = getRealDirPath(args[1]); // 父目录
                             String name = getRealFilePath(args[1]); // 文件名
-                            if(isLegalFileName(name)){
+                            if(isLegalFileName(name) || isLegalAttribute(args[2])){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.FILE_NAME_ERROR + "\n"));
                             } else {
-                                int is_change = fileManager.change(path, name, args[2].charAt(0));
+                                int is_change = fileManager.change(path, name, args[2]);
                                 Platform.runLater(() -> {
                                     if(is_change == -1){
                                         commandOutput.appendText(CmdConstants.FILE_IS_NOT_EXIT + "无法改变文件属性\n");
@@ -470,7 +470,7 @@ public class MainController implements Initializable {
     }
 
     private boolean isLegalAttribute(String path) {
-        return Objects.equals(path, "r") || Objects.equals(path, "rw") || Objects.equals(path, "wr");
+        return !(Objects.equals(path, "r") || Objects.equals(path, "rw") || Objects.equals(path, "wr"));
     }
 
     /**

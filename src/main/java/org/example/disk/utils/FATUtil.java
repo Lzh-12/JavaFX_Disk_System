@@ -56,15 +56,4 @@ public class FATUtil {
         }
         return -1; // 没有找到
     }
-
-
-    // 查询磁盘剩余空间
-    public int freeSpace() {
-        int count = 0;
-        for (int i = 3; i < DiskConstants.DISK_SIZE; i++) {
-            if (DISK.bt[i / 64][i & 64] == 0)
-                count++;
-        }
-        return count * 64;
-    }
 }

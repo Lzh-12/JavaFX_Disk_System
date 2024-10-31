@@ -203,23 +203,16 @@ public class FileUtil {
         }
     }
 
-    // 修改文件属性（文件名，磁盘号，数组，文件属性）
-    public static void changeFile(String name, String fileType, int index, char attribute){
-        // 查找文件名
-        for(int i = 0; i < 8; i++){
-            // 文件名三个字节
-            StringBuilder stringBuilder = new StringBuilder();
-            // 得到文件名
-            for (int j = 0; j < 5; j++) {
-                if((char) DISK.bt[index][i * 8 + j] != ' ')
-                    stringBuilder.append((char) DISK.bt[index][i * 8 + j]);
-            }
-            // 文件名相同
-            if(stringBuilder.toString().equals(name + fileType)){
-                DISK.bt[index][i * 8 + 5] = (byte) attribute;
-                return;
-            }
-        }
+    // 修改文件属性（文件路径，文件名，磁盘号，文件属性）
+    public static void changeFile(String path, String name, String fileType, int attribute){
+        int parentIndex = FileUtil.findParentDisk(path); // 父目录的磁盘号
+        int number = FileUtil.findFileIndex(path, name, fileType); // 文件在父目录中的位置
+        // 改变目录项中属性值
+        DISK.bt[parentIndex][number + 5] = (byte) attribute;
     }
 
+    // 修改文件长度（磁盘号，文件属性）
+    public static void addFileLength(int parentIndex, int number){
+        DISK.bt[parentIndex][number + 7] += 1;
+    }
 }

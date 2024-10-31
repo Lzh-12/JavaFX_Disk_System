@@ -38,7 +38,7 @@ public class DiskUtil {
             if(DISK.bt[i / 64][i % 64] == 0)
                 freeSpace += 1;
         }
-        return freeSpace;
+        return freeSpace * 64;
     }
 
     /**

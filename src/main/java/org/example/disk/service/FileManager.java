@@ -21,7 +21,7 @@ import static org.example.disk.entity.FAT.initFAT;
 public class FileManager {
     public static final Disk DISK = DiskManager.getDiskInstance(); // 目录登记表
     // 缓冲区
-    private final char[] buffer1 = new char[DiskConstants.BUFFER_SIZE]; // 写缓冲区
+    private char[] buffer1 = new char[DiskConstants.BUFFER_SIZE]; // 写缓冲区
     private final char[] buffer2 = new char[DiskConstants.BUFFER_SIZE]; // 读缓冲区
 
     // 已打开文件表
@@ -277,6 +277,9 @@ public class FileManager {
             if(number == -1)
                 return 2;
 
+            int parentIndex = FileUtil.findParentDisk(path); // 父目录的磁盘号
+            int loc = FileUtil.findFileIndex(path, name, fileType); // 在父目录中的位置
+
             for(int i = 0; i < OfTle.OPEN_FILE_TABLE_LENGTH; i++){
                 // 文件路径名 起始磁盘号 相同
                 if(this.ofTle[i] != null && Objects.equals(this.ofTle[i].getName(), path + '/' + name)){
@@ -297,7 +300,7 @@ public class FileManager {
                     int bNum = n - (n / 64) * 64; // 3 - (3/64) * 64   结果为3
                     this.ofTle[i].getWrite().setbNum(bNum - 1);
                     // 对磁盘文件进行写操作时，要写满缓冲后才写入磁盘
-                    writeContentToDisk(content, buffer1, index, i);
+                    writeContentToDisk(content, index, i, parentIndex, loc);
 
                     for(int k = 0; k < 6; k++){
                         System.out.println(Arrays.toString(DISK.bt[k]));
@@ -308,13 +311,11 @@ public class FileManager {
 
             System.out.println("文件不在已打开文件表中");
             // 不在已打开文件表中
-            int parentIndex = FileUtil.findParentDisk(path); // 父目录的磁盘号
-            int i = FileUtil.findFileIndex(path, name, fileType); // 在父目录中的位置
-            if(DISK.bt[parentIndex][i + 5] == FileConstants.ONLY_READ_FILE)
+            if(DISK.bt[parentIndex][loc + 5] == FileConstants.ONLY_READ_FILE)
                 return 3; // 只读文件不能写入
 
             // 插入已打开文件表中的位置
-            int is_insert = insertOfTle(path, name, fileType, parentIndex, i, 2);
+            int is_insert = insertOfTle(path, name, fileType, parentIndex, loc, 2);
             // 插入失败
             if(is_insert == -1)
                 return 0;
@@ -323,7 +324,7 @@ public class FileManager {
             int index = FATUtil.findLastBlock(number); // 找到文件的结束盘块
             System.out.println("文件在文件分配表的位置" + number + "文件的结束盘块" + index);
             // 写入缓冲区
-            writeContentToDisk(content, buffer1, index, is_insert);
+            writeContentToDisk(content, index, is_insert, parentIndex, loc);
 
             for(int k = 0; k < 6; k++){
                 System.out.println(Arrays.toString(DISK.bt[k]));
@@ -335,7 +336,7 @@ public class FileManager {
         }
     }
 
-    private void writeContentToDisk(String content, char[] buffer1, int index, int tableIndex) {
+    private void writeContentToDisk(String content, int index, int tableIndex, int parentIndex, int loc) {
         int count = content.length()  / DiskConstants.BUFFER_SIZE + 1; // 计算要写满缓冲区的次数
 
         for (int k = 0; k < count; k++) {
@@ -352,7 +353,7 @@ public class FileManager {
                 return;
             }
 
-            writeBufferToFile(index, buffer1, tableIndex);
+            writeBufferToFile(index, tableIndex, parentIndex, loc);
             buffer1 = new char[DiskConstants.BUFFER_SIZE]; // 更高效地清空缓冲区
             index = FATUtil.findLastBlock(index);
         }
@@ -360,7 +361,7 @@ public class FileManager {
 
 
     // 写入磁盘
-    private void writeBufferToFile(int index, char[] buffer1, int i) {
+    private void writeBufferToFile(int index, int i, int parentIndex, int loc) {
         // 原本的磁盘空间，注意原本的空字节0也会作为字符串的长度
         int origin = 0;
         for(int j = 0; j < 64; j++){
@@ -411,6 +412,8 @@ public class FileManager {
                 index = freeBlock;
                 // 新分配的磁盘写入目录登记表（下一块磁盘号255）
                 FATUtil.addFATByte(index, (byte) -1);
+                // 文件长度增加
+                FileUtil.addFileLength(parentIndex, loc);
                 // 更新写文件指针，指向文件结束块
                 this.ofTle[i].getWrite().setbNum(index);
 
@@ -445,6 +448,8 @@ public class FileManager {
 
                 // 更新文件分配表
                 FATUtil.addFATByte(index, (byte) freeBlock);
+                // 文件长度增加
+                FileUtil.addFileLength(parentIndex, loc);
                 index = freeBlock;
                 // 更新文件结束块
                 FATUtil.addFATByte(index, (byte) -1);
@@ -640,7 +645,7 @@ public class FileManager {
     /**
      * 8、改变文件属性
      */
-    public int change(String path, String name, char attribute){
+    public int change(String path, String name, String attribute){
         readWriteLock.writeLock().lock();
         try {
             String fileType = getFileType(name);
@@ -657,12 +662,12 @@ public class FileManager {
                     return 0;
             }
 
-            int parentIndex = FileUtil.findParentDisk(path); // 父目录的磁盘号
-            int number = FileUtil.findFileIndex(path, name, fileType); // 文件在父目录中的位置
-            // 没有打开，根据要求改变目录项中属性值
-            DISK.bt[parentIndex][number + 5] = (byte)Character.getNumericValue(attribute);
+            int att = 3; // 文件属性
+            if(Objects.equals(attribute, "rw") || Objects.equals(attribute, "wr"))
+                att = 4;
+
             // 在父目录中修改文件的信息
-            FileUtil.changeFile(name, fileType, parentIndex, attribute); // 修改文件属性
+            FileUtil.changeFile(path, name, fileType, att); // 修改文件属性
 
             for(int j = 0; j < 8; j++)
                 System.out.println(Arrays.toString(DISK.bt[j]));

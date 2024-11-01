@@ -13,7 +13,7 @@
           AnchorPane.leftAnchor="0.0"
           AnchorPane.rightAnchor="0.0"
           AnchorPane.topAnchor="0.0">
-            <SplitPane orientation="VERTICAL" dividerPositions="0.13, 0.87" prefWidth="560">
+            <SplitPane orientation="VERTICAL" dividerPositions="0.12, 0.88" prefWidth="560">
                 <FlowPane fx:id="flowPane" styleClass="flow-pane"/>
                 <!-- 添加命令输入区域 -->
                 <TextArea fx:id="commandOutput" editable="false" promptText="命令输出..." prefHeight="100.0"/>

@@ -383,9 +383,11 @@ public class MainController implements Initializable {
                         Platform.runLater(() -> commandOutput.appendText("磁盘剩余空间：" + DiskUtil.freeSpace() + "bytes\n"));
                         break;
                     case CmdConstants.MKFS:
-                        DiskUtil.formatDisk();
-                        flowPane.getChildren().clear();
-                        Platform.runLater(() -> commandOutput.appendText("磁盘格式化成功\n"));
+                        Platform.runLater(() -> {
+                            DiskUtil.formatDisk();
+                            flowPane.getChildren().clear();
+                            commandOutput.appendText("磁盘格式化成功\n");
+                        });
                         break;
                     // 查看命令
                     case CmdConstants.HELP:

@@ -9,6 +9,7 @@ import org.example.disk.utils.DiskUtil;
 import org.example.disk.utils.FATUtil;
 import org.example.disk.utils.FileUtil;
 
+import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -48,9 +49,8 @@ public class FileManager {
         initFAT();
 
         // 测试
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 6; i++)
             System.out.println(Arrays.toString(DISK.bt[i]));
-        }
 
         ofTle = new OfTle[OfTle.OPEN_FILE_TABLE_LENGTH];
     }
@@ -68,7 +68,6 @@ public class FileManager {
     public int createFile(String path, String name, String FileAttribute) {
         // 获取锁
         readWriteLock.writeLock().lock();
-        // 文件类型
         try {
             String fileType = getFileType(name);
             name = name.substring(0, name.lastIndexOf("."));
@@ -77,22 +76,18 @@ public class FileManager {
                 attribute = '3'; // 系统只读文件属性
 
             // 文件属性如果是只读性质则不能建立
-            if ((byte) Character.getNumericValue(attribute) != FileConstants.CAN_WRITE_FILE) {
+            if ((byte) Character.getNumericValue(attribute) != FileConstants.CAN_WRITE_FILE)
                 return -1;
-            }
 
             // 检查文件目录，确认无重名文件后，寻找空闲登记项进行登记
             int isCreate = FileUtil.findFileName(path, name, fileType);
 
             // 如果存在，查看有无重名
             //文件，如果有，则提示该文件已存在，建立文件失败
-            if (isCreate == 2) {
-                System.out.println("父目录不存在");
+            if (isCreate == 2)
                 return 2;
-            } else if(isCreate == 0) {
-                System.out.println("文件已存在，创建失败");
+            else if(isCreate == 0)
                 return 0; // 文件已存在
-            }
 
             // 找到一个空闲的磁盘块
             int number = FATUtil.findFreeBlock();
@@ -104,8 +99,7 @@ public class FileManager {
             FileItem fileItem = new FileItem(name, fileType, attribute, number, path);
 
             // 测试创建文件
-            System.out.println("文件名：" + fileItem.getFileName() + ", 文件类型：" + fileItem.getFileType() + ", 文件属性：" + fileItem.getAttribute() +
-                    ", 起始磁盘块：" + fileItem.getNumber() + ", 文件长度：" + fileItem.getLength());
+            System.out.println(fileItem);
 
             // 遍历磁盘块，找到所在目录的磁盘号，然后写入目录登记表
             int index = FileUtil.findParentDisk(path); // 父目录的磁盘号
@@ -145,8 +139,8 @@ public class FileManager {
             // 写入文件登记表
             DiskUtil.addByte(index, bt);
 
-            for(int j = 0; j < 6; j++)
-                System.out.println(Arrays.toString(DISK.bt[j]));
+            for(int i = 0; i < 6; i++)
+                System.out.println(Arrays.toString(DISK.bt[i]));
 
             return 1;
         } finally {
@@ -168,7 +162,7 @@ public class FileManager {
 
         // 实验中，读文件操作的主要工作是查找已打开文件表中是否存在该文件；如果不存在，则打开再读取
         try {
-            String fileType = getFileType(name);
+            String fileType = getFileType(name); // 文件类型
             name = name.substring(0, name.lastIndexOf(".")); // 文件名
             int index = FileUtil.findFileDisk(path, name, fileType); // 文件起始盘块
             // 文件不存在

@@ -32,8 +32,6 @@ public class MainController implements Initializable {
     @FXML
     public FlowPane flowPane; // 文件列表
 
-    private String currentPath; // 当前路径
-
     private FileManager fileManager;
     private DirectoryManager directoryManager;
 
@@ -55,7 +53,7 @@ public class MainController implements Initializable {
         // 目录管理器
         directoryManager = new DirectoryManager();
         // 根目录
-        this.currentPath = "~";
+        this.commandPath = "~";
         // 命令行
         initCommandLine();
         this.stage = stage;
@@ -69,9 +67,7 @@ public class MainController implements Initializable {
     private void initCommandLine() {
         this.commandOutput.setEditable(false);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        this.commandOutput.appendText("欢迎使用模拟磁盘文件系统!\n当前时间 " + LocalDateTime.now().format(formatter) + "\n\n" + "root@localhost" + this.currentPath + "> ");
-        // 初始化为根目录
-        this.commandPath = this.currentPath;
+        this.commandOutput.appendText("欢迎使用模拟磁盘文件系统!\n当前时间 " + LocalDateTime.now().format(formatter) + "\n\n" + "root@localhost" + this.commandPath + "> ");
         // 输入命令
         this.commandInput.setPromptText("输入命令...");
         // 获取键盘输入
@@ -408,6 +404,8 @@ public class MainController implements Initializable {
                                 mkdir   name       建立目录
                                 ls      [name]     显示目录内容
                                 rmdir   name       删除空目录
+                                cd      name       切换目录
+                              
 
                                 其他操作命令：
                                 help   查看所有命令

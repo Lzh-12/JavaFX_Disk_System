@@ -30,7 +30,6 @@ public class FileUtil {
         }
 
         boolean flag = false;
-        boolean flag2 = false;
         // 根目录起始盘块号
         int index = 2;
         for(int i = 0; i < paths.length; i++){

@@ -78,11 +78,8 @@ public class FileManager {
 
             // 文件属性如果是只读性质则不能建立
             if ((byte) Character.getNumericValue(attribute) != FileConstants.CAN_WRITE_FILE) {
-                System.out.println("只读文件或错误属性的文件不能创建");
                 return -1;
             }
-
-            System.out.println("创建文件" + " " +  path + " " + name);
 
             // 检查文件目录，确认无重名文件后，寻找空闲登记项进行登记
             int isCreate = FileUtil.findFileName(path, name, fileType);
@@ -148,9 +145,8 @@ public class FileManager {
             // 写入文件登记表
             DiskUtil.addByte(index, bt);
 
-            for(int j = 0; j < 6; j++){
+            for(int j = 0; j < 6; j++)
                 System.out.println(Arrays.toString(DISK.bt[j]));
-            }
 
             return 1;
         } finally {
@@ -170,7 +166,7 @@ public class FileManager {
         // 获取读锁
         readWriteLock.readLock().lock();
 
-        // 实验中，读文件操作的主要工作是查找已打开文件表中是否存在该文件；如果不存在，则打开再
+        // 实验中，读文件操作的主要工作是查找已打开文件表中是否存在该文件；如果不存在，则打开再读取
         try {
             String fileType = getFileType(name);
             name = name.substring(0, name.lastIndexOf(".")); // 文件名
@@ -272,7 +268,6 @@ public class FileManager {
             String fileType = getFileType(name); // 文件类型
             name = name.substring(0, name.lastIndexOf(".")); // 文件名
             int number = FileUtil.findFileDisk(path, name, fileType); // 起始磁盘号
-            System.out.println("起始磁盘号" + " " + number);
             // 文件不存在
             if(number == -1)
                 return 2;
@@ -289,8 +284,6 @@ public class FileManager {
 
                     // 找到存放文件的结束磁盘
                     int index = FATUtil.findLastBlock(number);
-                    System.out.println("找到存放文件的结束磁盘" + " " + index); // 3
-
                     // 打开文件时 dNum 和 bNum 为文件的末尾位置
                     this.ofTle[i].getWrite().setdNum(index);
                     // 一块磁盘的大小是64个字节
@@ -302,14 +295,12 @@ public class FileManager {
                     // 对磁盘文件进行写操作时，要写满缓冲后才写入磁盘
                     writeContentToDisk(content, index, i, parentIndex, loc);
 
-                    for(int k = 0; k < 6; k++){
+                    for(int k = 0; k < 6; k++)
                         System.out.println(Arrays.toString(DISK.bt[k]));
-                    }
                     return 1;
                 }
             }
 
-            System.out.println("文件不在已打开文件表中");
             // 不在已打开文件表中
             if(DISK.bt[parentIndex][loc + 5] == FileConstants.ONLY_READ_FILE)
                 return 3; // 只读文件不能写入
@@ -322,7 +313,6 @@ public class FileManager {
 
             // 插入成功
             int index = FATUtil.findLastBlock(number); // 找到文件的结束盘块
-            System.out.println("文件在文件分配表的位置" + number + "文件的结束盘块" + index);
             // 写入缓冲区
             writeContentToDisk(content, index, is_insert, parentIndex, loc);
 

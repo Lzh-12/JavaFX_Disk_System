@@ -226,7 +226,7 @@ public class FileManager {
     }
 
 
-    // 插入已打开文件表（文件路径 父目录的磁盘号 文件在目录中的起始位置， 打开方式）
+    // 插入已打开文件表（文件路径 父目录的磁盘号 文件在目录中的起始位置 打开方式）
     private int insertOfTle(String path, String name, String fileType, int parentIndex, int index, int flag) {
         for (int i = 0; i < OfTle.OPEN_FILE_TABLE_LENGTH; i++) {
             if (this.ofTle[i] == null) {

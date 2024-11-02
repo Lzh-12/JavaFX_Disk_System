@@ -56,5 +56,9 @@ public class DiskUtil {
         // 已损坏磁盘
         DISK.bt[0][23] = -2;
         DISK.bt[0][49] = -2;
+
+        System.out.println("格式化磁盘");
+        for(int i = 0; i < 8; i++)
+            System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
     }
 }

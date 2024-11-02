@@ -30,6 +30,8 @@ public class FileManager {
     // 已打开文件登记表中登记的文件数量
     private int OfTLeLength = 0;
 
+    String filePath = "disk.txt";
+
     // 读写锁
     public static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock() {
         @Override
@@ -97,9 +99,6 @@ public class FileManager {
 
             // 创建文件对象
             FileItem fileItem = new FileItem(name, fileType, attribute, number, path);
-
-            // 测试创建文件
-            System.out.println(fileItem);
 
             // 遍历磁盘块，找到所在目录的磁盘号，然后写入目录登记表
             int index = FileUtil.findParentDisk(path); // 父目录的磁盘号
@@ -364,8 +363,6 @@ public class FileManager {
             if((char) DISK.bt[index][origin-1] == '#')
                 origin -= 1;
 
-        System.out.println("写入文件前的文件分配表的下标" + " " + origin);
-
         int remain = 64 - len; // 目录登记表计算结束磁盘的剩余空间
         int count = 0;// 真正的长度
         for (char c : buffer1) {
@@ -373,8 +370,6 @@ public class FileManager {
             if (c != '\u0000')
                 count++;
         }
-
-        System.out.println("真正的长度count" + " " + count);
 
         // 缓冲区写满
         if(count == 64){
@@ -472,8 +467,6 @@ public class FileManager {
             if(i == -1)
                 return 0;
 
-            int parentIndex = FileUtil.findParentDisk(path); // 父目录的磁盘号
-            int number = FileUtil.findFileIndex(path, name, fileType); // 文件在父目录中的位置
             // 首先要看该文件是否打开，如果没有打开，就不用关闭
             for(int j = 0; j < OfTle.OPEN_FILE_TABLE_LENGTH; j++){
                 // 文件绝对路径相同

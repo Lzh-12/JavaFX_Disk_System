@@ -9,7 +9,6 @@ import org.example.disk.utils.DiskUtil;
 import org.example.disk.utils.FATUtil;
 import org.example.disk.utils.FileUtil;
 
-import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -30,7 +29,6 @@ public class FileManager {
     // 已打开文件登记表中登记的文件数量
     private int OfTLeLength = 0;
 
-    String filePath = "disk.txt";
 
     // 读写锁
     public static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock() {

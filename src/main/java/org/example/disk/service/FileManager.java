@@ -49,8 +49,8 @@ public class FileManager {
         initFAT();
 
         // 测试
-        for(int i = 0; i < 6; i++)
-            System.out.println(Arrays.toString(DISK.bt[i]));
+        for(int i = 0; i < 8; i++)
+            System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
 
         ofTle = new OfTle[OfTle.OPEN_FILE_TABLE_LENGTH];
     }
@@ -139,8 +139,9 @@ public class FileManager {
             // 写入文件登记表
             DiskUtil.addByte(index, bt);
 
-            for(int i = 0; i < 6; i++)
-                System.out.println(Arrays.toString(DISK.bt[i]));
+            System.out.println("创建文件后的磁盘");
+            for(int i = 0; i < 8; i++)
+                System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
 
             return 1;
         } finally {
@@ -190,6 +191,8 @@ public class FileManager {
             return read(index, i, length);
         } finally {
             // 释放读锁
+            for(int i = 0; i < 8; i++)
+                System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
             readWriteLock.readLock().unlock();
         }
     }
@@ -300,7 +303,7 @@ public class FileManager {
                 return 3; // 只读文件不能写入
 
             // 插入已打开文件表中的位置
-            int is_insert = insertOfTle(path, name, fileType, parentIndex, loc, 2);
+            int is_insert = insertOfTle(path, name, fileType, parentIndex, loc, 1);
             // 插入失败
             if(is_insert == -1)
                 return 0;
@@ -310,9 +313,9 @@ public class FileManager {
             // 写入缓冲区
             writeContentToDisk(content, index, is_insert, parentIndex, loc);
 
-            for(int k = 0; k < 6; k++){
-                System.out.println(Arrays.toString(DISK.bt[k]));
-            }
+            System.out.println("写入文件后的磁盘");
+            for(int i = 0; i < 8; i++)
+                System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
             return 1;
         } finally {
             // 释放写锁
@@ -476,7 +479,7 @@ public class FileManager {
                 // 文件绝对路径相同
                 if (this.ofTle[j] != null && this.ofTle[j].getName().equals(path + '/' + name)) {
                     // 如果已经打开，则检查打开方式，如果是写方式打开的，要追加文件结束符，修改目录项
-                    if (DISK.bt[parentIndex][number + 5] == FileConstants.CAN_WRITE_FILE) {
+                    if (this.ofTle[j].getFlag() == 1) {
                         // 查找文件的结束磁盘号
                         int endBlock = FATUtil.findLastBlock(i);
                         // 判断结束磁盘号的目录登记表是否写满
@@ -507,8 +510,9 @@ public class FileManager {
                     // 最后从已打开文件表中删除对应项（文件路径）(只读文件直接关闭)
                     removeOpenFile(path, name);
 
+                    System.out.println("关闭文件后的磁盘");
                     for(int k = 0; k < 8 ; k++)
-                        System.out.println(Arrays.toString(DISK.bt[k]));
+                        System.out.println(k + " " + Arrays.toString(DISK.bt[k]));
                     return 1;
                 }
             }
@@ -545,6 +549,7 @@ public class FileManager {
         try {
             String fileType = getFileType(name);
             name = name.substring(0, name.lastIndexOf("."));
+
             // 检查文件是否存在
             int i = FileUtil.findFileDisk(path, name, fileType);
             if(i == -1)
@@ -567,7 +572,7 @@ public class FileManager {
             // 更新文件分配表
             FATUtil.deleteFATByte(i);
 
-            System.out.println("删除文件后的目录登记表");
+            System.out.println("删除文件后的磁盘");
             for(int j = 0; j < 8; j++)
                 System.out.println(j + " " + Arrays.toString(DISK.bt[j]));
 
@@ -611,6 +616,14 @@ public class FileManager {
                     for(int j = 0; j < count; j++)
                         result.append((char) DISK.bt[index][j]);
 
+                    // 删除最后的文件结束符
+                    if(!result.isEmpty() && result.charAt(result.length() - 1) == '#')
+                        result.setLength(result.length() - 1);
+
+                    System.out.println("显示文件内容后的磁盘");
+                    for(int i = 0; i < 8; i++)
+                        System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
+
                     return result.toString();
                 } else {
                     // 读取当前目录登记表的全部内容
@@ -653,8 +666,9 @@ public class FileManager {
             // 在父目录中修改文件的信息
             FileUtil.changeFile(path, name, fileType, att); // 修改文件属性
 
+            System.out.println("修改文件属性后的磁盘");
             for(int j = 0; j < 8; j++)
-                System.out.println(Arrays.toString(DISK.bt[j]));
+                System.out.println(j + " " + Arrays.toString(DISK.bt[j]));
 
             // 修改成功
             return 1;

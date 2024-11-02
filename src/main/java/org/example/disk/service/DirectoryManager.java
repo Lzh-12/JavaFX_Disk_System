@@ -57,9 +57,10 @@ public class DirectoryManager {
             // 文件信息写入对应目录登记表中的目录
             DiskUtil.addByte(index, bt);
 
-            for(int j = 0; j < 6; j++){
-                System.out.println(Arrays.toString(DISK.bt[j]));
-            }
+            System.out.println("建立目录后的磁盘");
+            for(int j = 0; j < 8; j++)
+                System.out.println(j + " " + Arrays.toString(DISK.bt[j]));
+
             // 创建成功返回磁盘号
             return freeBlock;
         } finally {
@@ -80,6 +81,9 @@ public class DirectoryManager {
             int index = DirectoryUtil.findDirDisk(path, name);
             if(index == -1)
                 return CmdConstants.DIRECTORY_IS_NOT_EXIT;
+
+            for(int i = 0; i < 8; i++)
+                System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
 
             // 如果存在，一项一项显示目录内容（文件名和目录名）
             return DirectoryUtil.showDirectoryBt(index);
@@ -114,8 +118,9 @@ public class DirectoryManager {
                 // 清空文件目录项的内容（文件所在的目录登记项）
                 DirectoryUtil.deleteDirByte(i);
 
+                System.out.println("删除空目录后的磁盘");
                 for(int j = 0; j < 8; j++)
-                    System.out.println(Arrays.toString(DISK.bt[j]));
+                    System.out.println(j + " " + Arrays.toString(DISK.bt[j]));
 
                 // 删除成功返回磁盘号
                 return i;

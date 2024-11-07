@@ -12,7 +12,7 @@ public class FileUtil {
     // 检查文件名是否重复（文件路径 文件名 文件类型）
     public static int findFileName(String path, String name, String fileType) {
         // 计算多少层目录
-        String[] paths = path.split("/"); // ~/tmp   3
+        String[] paths = path.split("/");
         // 根目录
         if(paths.length == 1){
             for(int j = 0; j < 8; j++){
@@ -71,7 +71,7 @@ public class FileUtil {
     // 找到文件的父目录的磁盘号
     public static int findParentDisk(String path){
         // 计算多少层目录
-        String[] paths = path.split("/"); // ~/tmp   2
+        String[] paths = path.split("/");
         if(paths.length == 1)
             return 2;
 

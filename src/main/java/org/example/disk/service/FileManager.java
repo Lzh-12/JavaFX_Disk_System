@@ -352,9 +352,6 @@ public class FileManager {
         }
 
         origin = 64 - origin; // 已占用空间
-
-        System.out.println("写入文件前的磁盘" + origin);
-
         // 文件建立从下标为0的位置开始写入 0 0
         // 文件已被写入过覆盖之前的文件结束符‘#’的位置012  123   4-1 == ’#‘ 3  123#  2
         if(origin != 0)
@@ -409,10 +406,6 @@ public class FileManager {
         } else {
             // 缓冲区没有写满而且长度小于剩余长度
             if(count <= remain){
-
-                System.out.println("缓冲区没有写满而且长度小于剩余长度" + count + " " + remain);
-
-
                 for(int j = 0; j < count; j++){
                     this.ofTle[i].getWrite().setdNum(origin + j);
                     DISK.bt[index][origin + j] = (byte) buffer1[j];

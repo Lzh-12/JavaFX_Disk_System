@@ -124,6 +124,9 @@ public class FileUtil {
     public static int findFileDisk(String path, String name, String fileType) {
         // 计算多少层目录
         String[] paths = path.split("/"); // ~/tmp/var   3
+
+        System.out.println(Arrays.toString(paths)); // ~/tmp
+
         // 根目录
         if(paths.length == 1){
             for(int j = 0; j < 8; j++){
@@ -143,27 +146,29 @@ public class FileUtil {
         int index = 2;
         for(int i = 0; i < paths.length; i++){
             for(int j = 0; j < 8; j++){
-                StringBuilder stringBuilder = new StringBuilder();
-                for(int k = 0; k < 3; k++){
-                    // 下一级目录
-                    if((char) DISK.bt[index][j * 8 + k] != ' ')
-                        stringBuilder.append((char) DISK.bt[index][j * 8 + k]);
-                }
+                // 查找子目录
+                if(i != paths.length - 1){
+                    StringBuilder stringBuilder = new StringBuilder();
+                    if((int) DISK.bt[index][j * 8 + 5] == 8) {
+                        for (int k = 0; k < 3; k++) {
+                            // 下一级目录
+                            if ((char) DISK.bt[index][j * 8 + k] != ' ')
+                                stringBuilder.append((char) DISK.bt[index][j * 8 + k]);
+                        }
 
-                // 最后一次查找文件
-                if(i == paths.length - 1){
-                    for(int k = 3; k < 5; k++){
-                        if((char) DISK.bt[index][j * 8 + k] != ' ')
-                            stringBuilder.append((char) DISK.bt[index][j * 8 + k]);
-                    }
-                    if(stringBuilder.toString().equals(name + fileType)){
-                        return DISK.bt[index][j * 8 + 6]; // 返回起始磁盘号
+                        // 目录名相同
+                        if (stringBuilder.toString().equals(paths[i + 1]))
+                            index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
                     }
                 } else {
-                    // 目录名相同
-                    if((char) DISK.bt[index][j * 8 + 3] != ' ' && stringBuilder.toString().equals(paths[i+1])) {
-                        index = DISK.bt[index][j * 8 + 6]; // 更新起始盘块号
+                    // 最后一次查找文件
+                    StringBuilder result = new StringBuilder();
+                    for(int k = 0; k < 5; k++){
+                        if((char) DISK.bt[index][j * 8 + k] != ' ')
+                            result.append((char) DISK.bt[index][j * 8 + k]);
                     }
+                    if(result.toString().equals(name + fileType))
+                        return DISK.bt[index][j * 8 + 6]; // 返回起始磁盘号
                 }
             }
         }

@@ -91,13 +91,10 @@ public class FileManager {
 
             // 找到一个空闲的磁盘块
             int number = FATUtil.findFreeBlock();
-
             // 更新文件分配表（磁盘号，下一块的值-1）
             FATUtil.addFATByte(number, (byte) -1);
-
             // 创建文件对象
             FileItem fileItem = new FileItem(name, fileType, attribute, number, path);
-
             // 遍历磁盘块，找到所在目录的磁盘号，然后写入目录登记表
             int index = FileUtil.findParentDisk(path); // 父目录的磁盘号
 
@@ -109,7 +106,6 @@ public class FileManager {
             //起始盘块号：1 个字节；
             //文件长度：1 个字节
             char[] data = new char[6];
-
             // 文件名小于三个字节，剩余部分用空格代替
             for (int i = 0; i < 3; i++) {
                 if(i < fileItem.getFileName().length())
@@ -133,7 +129,7 @@ public class FileManager {
             bt[6] = (byte) fileItem.getNumber();
             bt[7] = (byte) fileItem.getLength();
 
-            // 写入文件登记表
+            // 写入磁盘空间
             DiskUtil.addByte(index, bt);
 
             System.out.println("创建文件后的磁盘");
@@ -348,12 +344,17 @@ public class FileManager {
     private void writeBufferToFile(int index, int i, int parentIndex, int loc) {
         // 原本的磁盘空间，注意原本的空字节0也会作为字符串的长度
         int origin = 0;
-        for(int j = 0; j < 64; j++){
+        for(int j = 63; j >= 0; j--){
             if(DISK.bt[index][j] != 0)
+                break;
+            else
                 origin++;
         }
 
-        int len = origin;
+        origin = 64 - origin; // 已占用空间
+
+        System.out.println("写入文件前的磁盘" + origin);
+
         // 文件建立从下标为0的位置开始写入 0 0
         // 文件已被写入过覆盖之前的文件结束符‘#’的位置012  123   4-1 == ’#‘ 3  123#  2
         if(origin != 0)
@@ -361,7 +362,7 @@ public class FileManager {
             if((char) DISK.bt[index][origin-1] == '#')
                 origin -= 1;
 
-        int remain = 64 - len; // 目录登记表计算结束磁盘的剩余空间
+        int remain = 64 - origin; // 目录登记表计算结束磁盘的剩余空间
         int count = 0;// 真正的长度
         for (char c : buffer1) {
             System.out.print(c);
@@ -374,7 +375,7 @@ public class FileManager {
             for (int m = 0; m < remain; m++) {
                 // 更新块内地址
                 this.ofTle[i].getWrite().setdNum(origin + m);
-                // 写入目录登记表（转为字节数据）
+                // 写入磁盘（转为字节数据）
                 DISK.bt[index][origin + m] = (byte) buffer1[m];
             }
             // 更新文件长度
@@ -408,6 +409,10 @@ public class FileManager {
         } else {
             // 缓冲区没有写满而且长度小于剩余长度
             if(count <= remain){
+
+                System.out.println("缓冲区没有写满而且长度小于剩余长度" + count + " " + remain);
+
+
                 for(int j = 0; j < count; j++){
                     this.ofTle[i].getWrite().setdNum(origin + j);
                     DISK.bt[index][origin + j] = (byte) buffer1[j];
@@ -473,15 +478,25 @@ public class FileManager {
                     if (this.ofTle[j].getFlag() == 1) {
                         // 查找文件的结束磁盘号
                         int endBlock = FATUtil.findLastBlock(i);
+
+                        System.out.println("111" + endBlock);
+                        System.out.print(Arrays.toString(DISK.bt[endBlock]));
+
+
                         // 判断结束磁盘号的目录登记表是否写满
                         int origin = 0;
                         // 从末尾开始查找，找到第一个不是0的字节数据
                         for (int k = 63; k >= 0; k--) {
-                            if (DISK.bt[endBlock][k] == 0)
-                                origin++;
+                            if(DISK.bt[endBlock][k] != 0)
+                                break;
+                            else
+                                origin++; // 空闲位置
                         }
 
-                        origin = 64 - origin;
+                        System.out.println("222");
+                        System.out.println(origin);
+
+                        origin = 64 - origin; // 已占用空间
                         // 已经写满
                         if (origin == 64) {
                             // 再分配一块磁盘
@@ -540,6 +555,9 @@ public class FileManager {
         try {
             String fileType = getFileType(name);
             name = name.substring(0, name.lastIndexOf("."));
+
+            System.out.println("删除文件" + path  + " " + name + " " + fileType);
+
 
             // 检查文件是否存在
             int i = FileUtil.findFileDisk(path, name, fileType);

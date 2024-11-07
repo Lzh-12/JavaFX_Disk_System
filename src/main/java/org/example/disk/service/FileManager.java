@@ -478,11 +478,6 @@ public class FileManager {
                     if (this.ofTle[j].getFlag() == 1) {
                         // 查找文件的结束磁盘号
                         int endBlock = FATUtil.findLastBlock(i);
-
-                        System.out.println("111" + endBlock);
-                        System.out.print(Arrays.toString(DISK.bt[endBlock]));
-
-
                         // 判断结束磁盘号的目录登记表是否写满
                         int origin = 0;
                         // 从末尾开始查找，找到第一个不是0的字节数据
@@ -492,9 +487,6 @@ public class FileManager {
                             else
                                 origin++; // 空闲位置
                         }
-
-                        System.out.println("222");
-                        System.out.println(origin);
 
                         origin = 64 - origin; // 已占用空间
                         // 已经写满
@@ -556,16 +548,10 @@ public class FileManager {
             String fileType = getFileType(name);
             name = name.substring(0, name.lastIndexOf("."));
 
-            System.out.println("删除文件" + path  + " " + name + " " + fileType);
-
-
             // 检查文件是否存在
             int i = FileUtil.findFileDisk(path, name, fileType);
             if(i == -1)
                 return -1; // 文件不存在
-
-            // 在文件的磁盘块中删除文件内容
-            FileUtil.deleteFile(i);
 
             // 文件打开，不能删除
             for(int j = 0; j < OfTle.OPEN_FILE_TABLE_LENGTH; j++){
@@ -574,6 +560,8 @@ public class FileManager {
                     return 0;
             }
 
+            // 没有打开，在文件的磁盘块中删除文件内容
+            FileUtil.deleteFile(i);
             // 如果没有打开，则删除文件目录项并归还文件所占磁盘空间
             int index = FileUtil.findParentDisk(path); // 父目录的磁盘号
             // 在目录登记表中的目录删除（文件名，所在目录的磁盘号，字节数组）
@@ -584,7 +572,6 @@ public class FileManager {
             System.out.println("删除文件后的磁盘");
             for(int j = 0; j < 8; j++)
                 System.out.println(j + " " + Arrays.toString(DISK.bt[j]));
-
             // 删除成功
             return 1;
         } finally {

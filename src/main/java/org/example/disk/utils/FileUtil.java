@@ -149,6 +149,7 @@ public class FileUtil {
                 // 查找子目录
                 if(i != paths.length - 1){
                     StringBuilder stringBuilder = new StringBuilder();
+                    // 判断为目录项
                     if((int) DISK.bt[index][j * 8 + 5] == 8) {
                         for (int k = 0; k < 3; k++) {
                             // 下一级目录

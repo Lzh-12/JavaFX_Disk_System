@@ -431,6 +431,7 @@ public class MainController implements Initializable {
                             DiskManager.saveDiskInstance();
                             commandOutput.appendText("退出程序\n");
                             stage.close();
+                            System.out.println("程序退出");
                             System.exit(0);
                         });
                     break;

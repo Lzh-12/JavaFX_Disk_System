@@ -85,7 +85,7 @@ public class DirectoryManager {
             for(int i = 0; i < 8; i++)
                 System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
 
-            // 如果存在，一项一项显示目录内容（文件名和目录名）
+            // 如果存在，一项一项显示目录内容（文件名、目录名、文件属性）
             return DirectoryUtil.showDirectoryBt(index);
         } finally {
             readWriteLock.readLock().unlock();

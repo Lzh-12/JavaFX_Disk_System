@@ -246,14 +246,13 @@ public class FileManager {
 
     /**
      * 4、写文件（文件路径，文件名，写入的内容）
+     * 实验中，写文件操作的主要工作是查找已打开文件表中是否存在该文件，如果不存在，则打开
+     * 后再写；如果存在，还要检查是否以写方式打开文件；如果不是写方式打开文件，不能写；最后从
+     *  已打开文件表中读出写指针，从这个位置上写入缓冲中的数据。
      */
     public int writeFile(String path, String name, String content) {
         // 获取写锁
         readWriteLock.writeLock().lock();
-        /* 实验中，写文件操作的主要工作是查找已打开文件表中是否存在该文件，如果不存在，则打开
-           后再写；如果存在，还要检查是否以写方式打开文件；如果不是写方式打开文件，不能写；最后从
-           已打开文件表中读出写指针，从这个位置上写入缓冲中的数据。
-         */
         try {
             String fileType = getFileType(name); // 文件类型
             name = name.substring(0, name.lastIndexOf(".")); // 文件名
@@ -285,7 +284,7 @@ public class FileManager {
                     // 对磁盘文件进行写操作时，要写满缓冲后才写入磁盘
                     writeContentToDisk(content, index, i, parentIndex, loc);
 
-                    for(int k = 0; k < 6; k++)
+                    for(int k = 0; k < 10; k++)
                         System.out.println(Arrays.toString(DISK.bt[k]));
                     return 1;
                 }
@@ -307,7 +306,7 @@ public class FileManager {
             writeContentToDisk(content, index, is_insert, parentIndex, loc);
 
             System.out.println("写入文件后的磁盘");
-            for(int i = 0; i < 8; i++)
+            for(int i = 0; i < 10; i++)
                 System.out.println(i + " " + Arrays.toString(DISK.bt[i]));
             return 1;
         } finally {

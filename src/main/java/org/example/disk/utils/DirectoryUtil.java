@@ -109,18 +109,31 @@ public class DirectoryUtil {
             if(DISK.bt[number][i * 8] == 0)
                 break;
 
-            stringBuilder.append("- ");
             for (int j = 0; j < 3; j++){
                 if((char) DISK.bt[number][i * 8 + j] != ' ')
                     stringBuilder.append((char) DISK.bt[number][i * 8 + j]);
             }
+            // 目录对象
+            if(DISK.bt[number][i * 8 + 5] == 8){
+                stringBuilder.append(" -rw");
+                result.append(stringBuilder).append("\n");
+                continue;
+            }
 
             // 不为空格表示文件要加上文件类型
-            if((int) DISK.bt[number][i * 8 + 5] == 3 || (int) DISK.bt[number][i * 8 + 5] == 4){
+            if((int) DISK.bt[number][i * 8 + 5] == 3){
                 stringBuilder.append(".");
+                stringBuilder.append((char) DISK.bt[number][i * 8 + 3]);
+                stringBuilder.append((char) DISK.bt[number][i * 8 + 4]);
+                stringBuilder.append(" -r");
+
+            } else if((int) DISK.bt[number][i * 8 + 5] == 4) {
+                stringBuilder.append(".");
+                stringBuilder.append((char) DISK.bt[number][i * 8 + 3]);
+                stringBuilder.append((char) DISK.bt[number][i * 8 + 4]);
+                stringBuilder.append(" -rw");
             }
-            stringBuilder.append((char) DISK.bt[number][i * 8 + 3]);
-            stringBuilder.append((char) DISK.bt[number][i * 8 + 4]);
+            
             // 换行输出
             result.append(stringBuilder).append("\n");
         }

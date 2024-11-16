@@ -346,7 +346,7 @@ public class MainController implements Initializable {
                                         commandOutput.appendText("目录删除成功\n");
                                         flowPane.getChildren().clear();
                                         addIcon(path);
-                                        System.out.println("删除节点" + is_rd); // 3
+                                        System.out.println("删除节点" + is_rd);
                                     }
                                 });
                             }

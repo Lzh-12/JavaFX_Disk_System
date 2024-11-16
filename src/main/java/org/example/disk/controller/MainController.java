@@ -332,7 +332,7 @@ public class MainController implements Initializable {
                         if (args.length == 2) {
                             String path = getRealDirPath(args[1]); // 父目录
                             String name = getRealFilePath(args[1]); // 目录名
-                            System.out.println("输入参数" + path + " " + name); // ~   test
+                            System.out.println("输入参数" + path + " " + name);
                             if(isLegalDirName(name)){
                                 Platform.runLater(() -> commandOutput.appendText(CmdConstants.DIRECTORY_NAME_ERROR + "\n"));
                             } else {

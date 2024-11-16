@@ -74,6 +74,7 @@ public class DirectoryManager {
     public String showDirectory(String path, String name){
         readWriteLock.readLock().lock();
         try {
+            System.out.println("当前目录：" + path + " " + name);
             // 显示目录内容首先要找到该目录，如果目录不存在，指令执行失败
             if(path.equals("~") && name.equals("~"))
                 return DirectoryUtil.showDirectoryBt(2);

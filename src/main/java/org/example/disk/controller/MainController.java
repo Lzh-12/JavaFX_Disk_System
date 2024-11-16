@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static java.lang.Thread.sleep;
 import static org.example.disk.service.FileManager.DISK;
 
 
@@ -313,8 +314,10 @@ public class MainController implements Initializable {
                             int split = commandPath.lastIndexOf("/");
                             // 根目录
                             Platform.runLater(() -> {
-                                if(split == -1)
+                                if(split == -1) {
+                                    System.out.println("根目录" + commandPath);
                                     commandOutput.appendText(directoryManager.showDirectory(commandPath, commandPath) + "\n");
+                                }
                                 else {
                                     String is_dir = directoryManager.showDirectory(commandPath.substring(0, split), commandPath.substring(split+1));
                                     commandOutput.appendText(is_dir + "\n");
@@ -428,10 +431,10 @@ public class MainController implements Initializable {
                     // 退出程序
                     case CmdConstants.QUIT:
                         Platform.runLater(() -> {
-                            DiskManager.saveDiskInstance();
                             commandOutput.appendText("退出程序\n");
+                            DiskManager.saveDiskInstance();
+                            System.out.println("保存进磁盘，程序退出");
                             stage.close();
-                            System.out.println("程序退出");
                             System.exit(0);
                         });
                     break;

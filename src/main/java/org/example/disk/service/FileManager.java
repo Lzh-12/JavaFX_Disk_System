@@ -554,7 +554,7 @@ public class FileManager {
 
             // 没有打开，在文件的磁盘块中删除文件内容
             FileUtil.deleteFile(i);
-            // 如果没有打开，则删除文件目录项并归还文件所占磁盘空间
+            // 删除文件目录项并归还文件所占磁盘空间
             int index = FileUtil.findParentDisk(path); // 父目录的磁盘号
             // 在目录登记表中的目录删除（文件名，所在目录的磁盘号，字节数组）
             DirectoryUtil.deleteByte(name, fileType, index);

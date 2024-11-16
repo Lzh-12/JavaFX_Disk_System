@@ -107,7 +107,7 @@ public class DirectoryUtil {
             StringBuilder stringBuilder = new StringBuilder();
             // 空目录项
             if(DISK.bt[number][i * 8] == 0)
-                break;
+                continue;
 
             for (int j = 0; j < 3; j++){
                 if((char) DISK.bt[number][i * 8 + j] != ' ')
